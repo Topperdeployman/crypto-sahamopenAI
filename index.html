@@ -43,7 +43,7 @@
         <div id="liveTickerBar" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <span id="tickerSymbol" class="font-extrabold text-lg text-indigo-400">BTCUSDT</span>
-                <span id="tickerPrice" class="text-2xl font-black text-white">Loading...</span>
+                <span id="tickerPrice" class="text-2xl font-black text-white">Memuat Data...</span>
             </div>
             <div class="flex gap-6 text-xs">
                 <div>
@@ -226,9 +226,9 @@
             }
         }
 
-        function updateAssetData() {
+        async function updateAssetData() {
             const selectedSymbol = document.getElementById('assetSelect').value;
-            fetchLivePrice(selectedSymbol);
+            await fetchLivePrice(selectedSymbol);
             loadTradingViewWidget(selectedSymbol);
         }
 
@@ -240,6 +240,12 @@
             
             resultSec.classList.add('hidden');
             logBox.innerHTML = `> Memulai inisialisasi 5 Agen Crew AI untuk ${symbol}...\n`;
+
+            // MEMASTIKAN HARGA REAL-TIME SUDAH DIAMBIL SEBELUM KALKULASI
+            if (currentPrice === 0) {
+                logBox.innerHTML += `> Mengambil data harga live dari Binance API...\n`;
+                await fetchLivePrice(symbol);
+            }
 
             for(let i=1; i<=5; i++) {
                 document.getElementById(`agent-${i}`).classList.remove('opacity-60', 'border-indigo-500');
@@ -262,7 +268,7 @@
             }, 1800);
 
             setTimeout(() => {
-                logBox.innerHTML += `> [Agen 4] Trading Strategist: Membaca harga live di $${currentPrice.toLocaleString()}...\n`;
+                logBox.innerHTML += `> [Agen 4] Trading Strategist: Membaca harga live di $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}...\n`;
                 statusLabel.innerText = 'Agen 5 Sedang Bekerja...';
             }, 2400);
 
@@ -274,10 +280,10 @@
             setTimeout(() => {
                 logBox.innerHTML += `> === KEPUTUSAN 5 AGEN CREW AI BERHASIL DITERBITKAN ===\n`;
                 
-                // MENGGUNAKAN HARGA LIVE ASLI DARI PASAR
+                // KALKULASI MENGGUNAKAN HARGA REAL-TIME ASLI
                 const entry = currentPrice;
-                const tp = currentPrice * 1.04; // Target Profit +4% dari harga live
-                const sl = currentPrice * 0.98; // Stop Loss -2% dari harga live
+                const tp = currentPrice * 1.04; // Target Profit +4%
+                const sl = currentPrice * 0.98; // Stop Loss -2%
 
                 document.getElementById('fundScore').innerText = "91/100 (Strong)";
                 document.getElementById('signalBadge').innerHTML = `<span class="text-emerald-400">🟢 SIGNAL: OPEN LONG (Live Sync)</span>`;
@@ -289,8 +295,8 @@
             }, 3600);
         }
 
-        window.onload = () => {
-            updateAssetData();
+        window.onload = async () => {
+            await updateAssetData();
             setInterval(() => {
                 const selectedSymbol = document.getElementById('assetSelect').value;
                 fetchLivePrice(selectedSymbol);
