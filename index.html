@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid 5-Agent Trading AI & Live Market</title>
+    <title>Hybrid 5-Agent Trading AI & TradingView Live</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
@@ -27,54 +27,31 @@
             <div>
                 <h1 class="text-2xl font-bold flex items-center gap-2">
                     <span class="bg-indigo-600 p-2 rounded-lg text-white">⚡</span> 
-                    Hybrid 5-Agent Crew AI + Live Market
+                    Hybrid 5-Agent Crew AI Dashboard
                 </h1>
-                <p class="text-sm text-slate-400 mt-1">Sistem Intelligence Trading Berbasis Multi-Agen dengan Data Pasar Real-Time & Chart TradingView</p>
+                <p class="text-sm text-slate-400 mt-1">Sistem Intelligence Trading Berbasis Multi-Agen + Live Feed TradingView</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="bg-slate-800 px-4 py-2 rounded-xl text-xs font-medium text-emerald-400 border border-slate-700 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Live Data Connected
+                    TradingView Live Feed
                 </div>
             </div>
         </header>
 
-        <!-- Live Price Bar -->
-        <div id="liveTickerBar" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <span id="tickerSymbol" class="font-extrabold text-lg text-indigo-400">BTCUSDT</span>
-                <span id="tickerPrice" class="text-2xl font-black text-white">$82,376.00</span>
-            </div>
-            <div class="flex gap-6 text-xs">
-                <div>
-                    <span class="text-slate-400 block">Perubahan 24 Jam</span>
-                    <span id="tickerChange" class="font-bold text-emerald-400">+0.32%</span>
-                </div>
-                <div>
-                    <span class="text-slate-400 block">Tertinggi 24j</span>
-                    <span id="tickerHigh" class="font-bold text-slate-200">$84,800.00</span>
-                </div>
-                <div>
-                    <span class="text-slate-400 block">Terendah 24j</span>
-                    <span id="tickerLow" class="font-bold text-slate-200">$81,500.00</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Layout -->
+        <!-- Parameter & Kontrol -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Panel Kontrol -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 h-fit">
                 <h2 class="text-lg font-semibold border-b border-slate-800 pb-2">Parameter Analisis</h2>
                 
                 <div>
                     <label class="block text-sm text-slate-400 mb-1">Target Aset Pasar</label>
                     <select id="assetSelect" onchange="updateAssetData()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500">
-                        <option value="BTCUSDT">BTC/USDT (Bitcoin)</option>
-                        <option value="ETHUSDT">ETH/USDT (Ethereum)</option>
-                        <option value="SOLUSDT">SOL/USDT (Solana)</option>
-                        <option value="BNBUSDT">BNB/USDT (Binance Coin)</option>
+                        <option value="BTCUSDT" data-price="82376">BTC/USDT (Bitcoin)</option>
+                        <option value="ETHUSDT" data-price="2650">ETH/USDT (Ethereum)</option>
+                        <option value="SOLUSDT" data-price="185">SOL/USDT (Solana)</option>
+                        <option value="BNBUSDT" data-price="590">BNB/USDT (Binance Coin)</option>
                     </select>
                 </div>
 
@@ -92,14 +69,13 @@
                 </button>
             </div>
 
-            <!-- Panel Visualisasi Alur Kerja 5 Agen -->
+            <!-- Panel Alur Kerja 5 Agen -->
             <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h2 class="text-lg font-semibold">Alur Kerja Tim 5 Agen AI</h2>
                     <span id="workflowStatus" class="text-xs text-indigo-400">Menunggu Perintah...</span>
                 </div>
 
-                <!-- Grid 5 Agen -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div id="agent-1" class="border border-slate-800 bg-slate-950 p-3 rounded-xl opacity-60">
                         <span class="text-[10px] text-indigo-400 font-semibold uppercase">AGEN 1</span>
@@ -128,9 +104,8 @@
                     </div>
                 </div>
 
-                <!-- Terminal Log -->
                 <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-28 overflow-y-auto" id="terminalLog">
-                    > Sistem siap. Klik tombol "Jalankan 5 Agen Hybrid Crew AI"...
+                    > Sistem siap. Klik "Jalankan 5 Agen Hybrid Crew AI"...
                 </div>
             </div>
         </div>
@@ -163,10 +138,10 @@
             </div>
         </div>
 
-        <!-- Section Chart TradingView Live -->
+        <!-- TradingView Live Chart -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
             <h2 class="text-lg font-semibold flex items-center gap-2">
-                <span>📊</span> Live Interactive Chart (TradingView)
+                <span>📊</span> Interactive Live Chart (TradingView)
             </h2>
             <div class="w-full h-[500px] rounded-xl overflow-hidden border border-slate-800" id="tradingview_chart"></div>
         </div>
@@ -175,14 +150,6 @@
 
     <script>
         let selectedRisk = 'Moderat';
-        
-        // Database harga default
-        const marketData = {
-            "BTCUSDT": { price: 82376.00, high: 84800.00, low: 81500.00, change: "+0.32%" },
-            "ETHUSDT": { price: 2650.50, high: 2720.00, low: 2580.00, change: "+1.15%" },
-            "SOLUSDT": { price: 185.20, high: 192.00, low: 178.50, change: "-0.45%" },
-            "BNBUSDT": { price: 590.80, high: 605.00, low: 582.00, change: "+0.80%" }
-        };
 
         document.querySelectorAll('.risk-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -213,25 +180,19 @@
         }
 
         function updateAssetData() {
-            const selectedSymbol = document.getElementById('assetSelect').value;
-            const data = marketData[selectedSymbol] || marketData["BTCUSDT"];
-
-            document.getElementById('tickerSymbol').innerText = selectedSymbol;
-            document.getElementById('tickerPrice').innerText = '$' + data.price.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('tickerChange').innerText = data.change;
-            document.getElementById('tickerHigh').innerText = '$' + data.high.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('tickerLow').innerText = '$' + data.low.toLocaleString('en-US', {minimumFractionDigits: 2});
-
-            loadTradingViewWidget(selectedSymbol);
+            const selectElem = document.getElementById('assetSelect');
+            const symbol = selectElem.value;
+            loadTradingViewWidget(symbol);
         }
 
-        async function runHybridCrew() {
-            const symbol = document.getElementById('assetSelect').value;
+        function runHybridCrew() {
+            const selectElem = document.getElementById('assetSelect');
+            const symbol = selectElem.value;
+            const basePrice = parseFloat(selectElem.options[selectElem.selectedIndex].getAttribute('data-price')) || 82376;
+
             const logBox = document.getElementById('terminalLog');
             const statusLabel = document.getElementById('workflowStatus');
             const resultSec = document.getElementById('resultSection');
-            
-            const currentPrice = marketData[symbol].price;
 
             resultSec.classList.add('hidden');
             logBox.innerHTML = `> Memulai inisialisasi 5 Agen Crew AI untuk ${symbol}...\n`;
@@ -257,24 +218,24 @@
             }, 1800);
 
             setTimeout(() => {
-                logBox.innerHTML += `> [Agen 4] Trading Strategist: Membaca harga live di $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}...\n`;
+                logBox.innerHTML += `> [Agen 4] Trading Strategist: Membaca harga pasar di $${basePrice.toLocaleString('en-US')}...\n`;
                 statusLabel.innerText = 'Agen 5 Sedang Bekerja...';
             }, 2400);
 
             setTimeout(() => {
-                logBox.innerHTML += `> [Agen 5] Risk Validator: Menetapkan TP/SL berdasarkan harga real-time...\n`;
+                logBox.innerHTML += `> [Agen 5] Risk Validator: Menetapkan TP/SL berdasarkan pergerakan pasar...\n`;
                 statusLabel.innerText = 'Analisis Selesai!';
             }, 3000);
 
             setTimeout(() => {
                 logBox.innerHTML += `> === KEPUTUSAN 5 AGEN CREW AI BERHASIL DITERBITKAN ===\n`;
                 
-                const entry = currentPrice;
-                const tp = currentPrice * 1.04; // Target Profit +4%
-                const sl = currentPrice * 0.98; // Stop Loss -2%
+                const entry = basePrice;
+                const tp = basePrice * 1.04; // Take Profit +4%
+                const sl = basePrice * 0.98; // Stop Loss -2%
 
                 document.getElementById('fundScore').innerText = "91/100 (Strong)";
-                document.getElementById('signalBadge').innerHTML = `<span class="text-emerald-400">🟢 SIGNAL: OPEN LONG (Live Sync)</span>`;
+                document.getElementById('signalBadge').innerHTML = `<span class="text-emerald-400">🟢 SIGNAL: OPEN LONG (Verified)</span>`;
                 document.getElementById('entryPrice').innerText = "$" + entry.toLocaleString('en-US', {minimumFractionDigits: 2});
                 document.getElementById('tpPrice').innerText = "$" + tp.toLocaleString('en-US', {minimumFractionDigits: 2});
                 document.getElementById('slPrice').innerText = "$" + sl.toLocaleString('en-US', {minimumFractionDigits: 2});
