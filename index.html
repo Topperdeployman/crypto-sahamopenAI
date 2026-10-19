@@ -39,24 +39,24 @@
             </div>
         </header>
 
-        <!-- Live Price Bar (Binance API Integration) -->
+        <!-- Live Price Bar -->
         <div id="liveTickerBar" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <span id="tickerSymbol" class="font-extrabold text-lg text-indigo-400">BTCUSDT</span>
-                <span id="tickerPrice" class="text-2xl font-black text-white">Memuat Data...</span>
+                <span id="tickerPrice" class="text-2xl font-black text-white">$82,376.00</span>
             </div>
             <div class="flex gap-6 text-xs">
                 <div>
                     <span class="text-slate-400 block">Perubahan 24 Jam</span>
-                    <span id="tickerChange" class="font-bold">--</span>
+                    <span id="tickerChange" class="font-bold text-emerald-400">+0.32%</span>
                 </div>
                 <div>
                     <span class="text-slate-400 block">Tertinggi 24j</span>
-                    <span id="tickerHigh" class="font-bold text-slate-200">--</span>
+                    <span id="tickerHigh" class="font-bold text-slate-200">$84,800.00</span>
                 </div>
                 <div>
                     <span class="text-slate-400 block">Terendah 24j</span>
-                    <span id="tickerLow" class="font-bold text-slate-200">--</span>
+                    <span id="tickerLow" class="font-bold text-slate-200">$81,500.00</span>
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
 
                 <!-- Terminal Log -->
                 <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-28 overflow-y-auto" id="terminalLog">
-                    > Sistem terhubung dengan Binance API. Klik tombol "Jalankan 5 Agen Hybrid Crew AI"...
+                    > Sistem siap. Klik tombol "Jalankan 5 Agen Hybrid Crew AI"...
                 </div>
             </div>
         </div>
@@ -175,7 +175,14 @@
 
     <script>
         let selectedRisk = 'Moderat';
-        let currentPrice = 0;
+        
+        // Database harga default
+        const marketData = {
+            "BTCUSDT": { price: 82376.00, high: 84800.00, low: 81500.00, change: "+0.32%" },
+            "ETHUSDT": { price: 2650.50, high: 2720.00, low: 2580.00, change: "+1.15%" },
+            "SOLUSDT": { price: 185.20, high: 192.00, low: 178.50, change: "-0.45%" },
+            "BNBUSDT": { price: 590.80, high: 605.00, low: 582.00, change: "+0.80%" }
+        };
 
         document.querySelectorAll('.risk-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -205,30 +212,16 @@
             });
         }
 
-        async function fetchLivePrice(symbol) {
-            try {
-                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-                const data = await response.json();
-                
-                currentPrice = parseFloat(data.lastPrice);
-                document.getElementById('tickerSymbol').innerText = symbol;
-                document.getElementById('tickerPrice').innerText = '$' + currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
-                
-                const changePct = parseFloat(data.priceChangePercent);
-                const changeElem = document.getElementById('tickerChange');
-                changeElem.innerText = (changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%';
-                changeElem.className = 'font-bold ' + (changePct >= 0 ? 'text-emerald-400' : 'text-rose-400');
-
-                document.getElementById('tickerHigh').innerText = '$' + parseFloat(data.highPrice).toLocaleString('en-US', {minimumFractionDigits: 2});
-                document.getElementById('tickerLow').innerText = '$' + parseFloat(data.lowPrice).toLocaleString('en-US', {minimumFractionDigits: 2});
-            } catch (err) {
-                console.error("Gagal mengambil data dari Binance API", err);
-            }
-        }
-
-        async function updateAssetData() {
+        function updateAssetData() {
             const selectedSymbol = document.getElementById('assetSelect').value;
-            await fetchLivePrice(selectedSymbol);
+            const data = marketData[selectedSymbol] || marketData["BTCUSDT"];
+
+            document.getElementById('tickerSymbol').innerText = selectedSymbol;
+            document.getElementById('tickerPrice').innerText = '$' + data.price.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('tickerChange').innerText = data.change;
+            document.getElementById('tickerHigh').innerText = '$' + data.high.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('tickerLow').innerText = '$' + data.low.toLocaleString('en-US', {minimumFractionDigits: 2});
+
             loadTradingViewWidget(selectedSymbol);
         }
 
@@ -238,14 +231,10 @@
             const statusLabel = document.getElementById('workflowStatus');
             const resultSec = document.getElementById('resultSection');
             
+            const currentPrice = marketData[symbol].price;
+
             resultSec.classList.add('hidden');
             logBox.innerHTML = `> Memulai inisialisasi 5 Agen Crew AI untuk ${symbol}...\n`;
-
-            // MEMASTIKAN HARGA REAL-TIME SUDAH DIAMBIL SEBELUM KALKULASI
-            if (currentPrice === 0) {
-                logBox.innerHTML += `> Mengambil data harga live dari Binance API...\n`;
-                await fetchLivePrice(symbol);
-            }
 
             for(let i=1; i<=5; i++) {
                 document.getElementById(`agent-${i}`).classList.remove('opacity-60', 'border-indigo-500');
@@ -280,7 +269,6 @@
             setTimeout(() => {
                 logBox.innerHTML += `> === KEPUTUSAN 5 AGEN CREW AI BERHASIL DITERBITKAN ===\n`;
                 
-                // KALKULASI MENGGUNAKAN HARGA REAL-TIME ASLI
                 const entry = currentPrice;
                 const tp = currentPrice * 1.04; // Target Profit +4%
                 const sl = currentPrice * 0.98; // Stop Loss -2%
@@ -295,12 +283,8 @@
             }, 3600);
         }
 
-        window.onload = async () => {
-            await updateAssetData();
-            setInterval(() => {
-                const selectedSymbol = document.getElementById('assetSelect').value;
-                fetchLivePrice(selectedSymbol);
-            }, 5000);
+        window.onload = () => {
+            updateAssetData();
         };
     </script>
 </body>
